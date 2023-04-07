@@ -65,12 +65,33 @@ int main(int argc, char* argv[]){
     vector< pair<thread::id, vector<string>> > logs;
     mutex results_mutex;
     mutex logs_mutex;
-    search(dir, pattern, &results, threads, &logs);
+    auto start = chrono::high_resolution_clock::now();
     {
         GreprThreadPool pool(threads);
         search(dir, pattern, &results, &logs, &pool, &results_mutex, &logs_mutex);
     }
     print_results(resultfile, &results);
     print_logs(logfile, &logs);
+    auto stop = chrono::high_resolution_clock::now();
+    auto time = stop-start;
+
+    int searched_files = 0;
+    for(const auto& l: logs){
+        searched_files += l.second.size();
+    }
+
+    int patterns_number = 0;
+    for(const auto& res: results){
+        patterns_number += res.patterns_found;
+    }
+    cout << "dir: " << dir << endl;
+    cout << "Searched files: " << searched_files << endl;
+    cout << "Files with pattern: " << results.size() << endl;
+    cout << "Patterns number: " << patterns_number << endl;
+    cout << "Result file: " << resultfile << endl;
+    cout << "Log file: " << logfile << endl;
+    cout << "Used threads: " << logs.size() << endl;
+    cout << "Elapsed time = " << time/std::chrono::milliseconds(1) << " [ms]" << endl;
+
 
 }
