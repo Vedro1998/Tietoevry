@@ -6,5 +6,5 @@ add_executable(grepr
                main.cpp
                ArgParser.cpp
                OutPrinter.cpp
-               utils.cpp
+               lib/utils.cpp
                search.cpp)

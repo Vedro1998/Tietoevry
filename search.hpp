@@ -3,9 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <utility>
-#include <thread>
-#include <mutex>
 #include "GreprThreadPool.hpp"
 #include "structs.hpp"
 

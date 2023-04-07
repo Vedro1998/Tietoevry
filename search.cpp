@@ -3,8 +3,6 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include <mutex>
-#include <unordered_map>
 #include "GreprThreadPool.hpp"
 
 #include <thread>
