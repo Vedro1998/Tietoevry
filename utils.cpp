@@ -1,7 +1,7 @@
 #include "utils.hpp"
 #include <algorithm>
 
-void sort_results(grep_res* results){
+void sort_results(grep_results* results){
     sort(results->begin(), results->end(), [](search_res& r1, search_res& r2){
          return r2.patterns_found < r1.patterns_found; 
         });

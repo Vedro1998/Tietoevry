@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
         return err;
 
 
-    grep_res results;
+    grep_results results;
     grep_logs logs;
     mutex results_mutex;
     mutex logs_mutex;

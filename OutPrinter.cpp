@@ -4,7 +4,7 @@
 
 using namespace std;
 
-OutPrinter::OutPrinter(const grep_res& results_, const grep_logs& logs_) :
+OutPrinter::OutPrinter(const grep_results& results_, const grep_logs& logs_) :
             results(results_), logs(logs_)
 {}
 
