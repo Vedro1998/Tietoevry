@@ -3,14 +3,22 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 #include "structs.hpp"
 #include "types.hpp"
 
 class OutPrinter {
 public:
-    void print_results(std::string res_file, grep_res* results);
-    void print_logs(std::string log_file, grep_logs* logs);
-    void print_stats(const grep_logs& logs, const grep_res& results, int time_ms, const grep_input& input);
+    OutPrinter(const grep_res& results_, const grep_logs& logs_);
+    void print_results(std::string res_file);
+    void print_logs(std::string log_file);
+    void print_stats( const grep_input& input, int time_ms);
+private:
+    void res_to_file(const search_res& res, std::ofstream& ofs);
+    int count_searched_files();
+    int count_patterns_found();
+    const grep_logs& logs;
+    const grep_res& results;
 };
 
 #endif
