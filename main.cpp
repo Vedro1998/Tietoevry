@@ -2,8 +2,12 @@
 #include <sstream>
 #include <cstring>
 #include <string>
+#include <thread>
+#include "structs.hpp"
+#include "search.hpp"
+#include "print.hpp"
 
-using namespace std;
+using namespace std;;
 
 void print_help(){
     cout << "Usage: grepr <pattern (a string)> [-d | --dir <directory>]" << endl;
@@ -52,5 +56,10 @@ int main(int argc, char* argv[]){
             return 2;
         }
     }
-    
+
+
+    vector<search_res> results;
+    search(dir, pattern, &results);
+    print_results(resultfile, &results);
+
 }
