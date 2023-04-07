@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <thread>
+#include <utility>
 #include "structs.hpp"
 #include "search.hpp"
 #include "print.hpp"
@@ -59,7 +60,9 @@ int main(int argc, char* argv[]){
 
 
     vector<search_res> results;
-    search(dir, pattern, &results, threads);
+    vector< pair<thread::id, vector<string>> > logs;
+    search(dir, pattern, &results, threads, &logs);
     print_results(resultfile, &results);
+    print_logs(logfile, &logs);
 
 }

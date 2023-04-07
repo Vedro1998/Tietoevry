@@ -25,7 +25,6 @@ void print_results(string res_file, vector<search_res>* results){
                 int line_with_pattern_idx = 0;
                 string line_buf;
                 while(!ifs.eof()){
-                    // TODO: pomyśleć, czy nie zmienić na ignore, dopóki idx się nie zgadza
                     getline(ifs, line_buf);
                     // TODO: zmienić idx line_with_pattern_idx na iterator 
                     if(line_idx == res.pattern_lines[line_with_pattern_idx]){
@@ -39,4 +38,26 @@ void print_results(string res_file, vector<search_res>* results){
         }
         ofs.close();
     }
+}
+
+void print_logs(std::string log_file, vector< pair<thread::id, vector<string>> >* threads_files){
+    sort(threads_files->begin(), threads_files->end(), [](auto& p1, auto& p2){return p2.second.size() <p1.second.size();});
+    ofstream ofs(log_file);
+    if(!ofs){
+        cerr << "Error: unable to open log file: " << log_file << endl;
+    }
+    else {
+        for(const auto& l: *threads_files){
+            ofs << l.first << ": ";
+            for(int i = 0; i < l.second.size(); i++){
+                ofs << l.second[i].substr(l.second[i].find_last_of('/'));
+                if(i < l.second.size()-1)
+                    ofs << ", ";
+                else
+                    ofs << "\n";
+            }
+        }
+        ofs.close();
+    }
+
 }

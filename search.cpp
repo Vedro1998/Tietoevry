@@ -4,6 +4,7 @@
 #include <iostream>
 #include <regex>
 #include <mutex>
+#include <unordered_map>
 #include "GreprThreadPool.hpp"
 
 #include <thread>
@@ -11,10 +12,18 @@
 using namespace std;
 namespace fs = filesystem;
 
-void search_file(string filepath, string pattern, vector<search_res>* results, mutex* results_mutex){
-    results_mutex->lock();
-    cout << "I'm called by thread: " << this_thread::get_id() << endl;
-    results_mutex->unlock();
+void search_file(string filepath, string pattern, vector<search_res>* results, 
+                 mutex* results_mutex, vector< pair<thread::id, vector<string>> >* logs, mutex* logs_mutex)
+{
+    thread::id id = this_thread::get_id();
+    logs_mutex->lock();
+    auto found_it = find_if(logs->begin(), logs->end(), [=](auto& l){return l.first==id;});
+    if(found_it != logs->end())
+            found_it->second.push_back(filepath);        
+        else
+            logs->emplace_back(id, vector<string>{filepath});
+    logs_mutex->unlock();
+
     ifstream ifs(filepath);
     if(!ifs){
         cerr << "Search error: couldn't open file: " << filepath << endl;
@@ -47,17 +56,16 @@ void search_file(string filepath, string pattern, vector<search_res>* results, m
     }
 }
 
-// TODO: change name to 'grep' after changing conception
-void search(string search_dir, string pattern, vector<search_res>* results, unsigned threads){
+void search(string search_dir, string pattern, vector<search_res>* results, unsigned threads, 
+            vector< pair<thread::id, vector<string>> >* threads_files){
     GreprThreadPool pool(threads);
     mutex results_mutex;
+    mutex logs_mutex;
     for(const auto& entry : fs::directory_iterator(search_dir)){
         if(entry.is_directory())
-            search(entry.path(), pattern, results, threads);
+            search(entry.path(), pattern, results, threads, threads_files);
         else{
-            //TODO: change to adding search_file() to thread pool
-            //      +otoczyć muteksem aktualizację wektora wyników
-            pool.submit(search_file, entry.path(), pattern, results, &results_mutex);
+            pool.submit(search_file, entry.path(), pattern, results, &results_mutex, threads_files, &logs_mutex);
         }
     }
 
