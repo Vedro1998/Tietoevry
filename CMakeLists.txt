@@ -5,5 +5,5 @@ include_directories(./lib/)
 add_executable(grepr 
                main.cpp
                ArgParser.cpp
-               search.cpp
-               print.cpp)
+               OutPrinter.cpp
+               search.cpp)

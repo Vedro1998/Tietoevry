@@ -1,11 +1,11 @@
-#include "print.hpp"
+#include "OutPrinter.hpp"
 #include <fstream>
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
 
-void print_results(string res_file, vector<search_res>* results){
+void OutPrinter::print_results(string res_file, grep_res* results){
     ofstream ofs(res_file);
     ifstream ifs;
     if(!ofs){
@@ -40,14 +40,14 @@ void print_results(string res_file, vector<search_res>* results){
     }
 }
 
-void print_logs(std::string log_file, vector< pair<thread::id, vector<string>> >* threads_files){
-    sort(threads_files->begin(), threads_files->end(), [](auto& p1, auto& p2){return p2.second.size() <p1.second.size();});
+void OutPrinter::print_logs(string log_file, grep_logs* logs){
+    sort(logs->begin(), logs->end(), [](auto& p1, auto& p2){return p2.second.size() <p1.second.size();});
     ofstream ofs(log_file);
     if(!ofs){
         cerr << "Error: unable to open log file: " << log_file << endl;
     }
     else {
-        for(const auto& l: *threads_files){
+        for(const auto& l: *logs){
             ofs << l.first << ": ";
             for(int i = 0; i < l.second.size(); i++){
                 ofs << l.second[i].substr(l.second[i].find_last_of('/')+1);
@@ -59,5 +59,23 @@ void print_logs(std::string log_file, vector< pair<thread::id, vector<string>> >
         }
         ofs.close();
     }
+}
 
+void OutPrinter::print_stats(const grep_logs& logs, const grep_res& results, int time_ms, const grep_input& input){
+    int searched_files = 0;
+    for(const auto& l: logs){
+        searched_files += l.second.size();
+    }
+
+    int patterns_number = 0;
+    for(const auto& res: results){
+        patterns_number += res.patterns_found;
+    }
+    cout << "Searched files: " << searched_files << endl;
+    cout << "Files with pattern: " << results.size() << endl;
+    cout << "Patterns number: " << patterns_number << endl;
+    cout << "Result file: " << input.resultfile << endl;
+    cout << "Log file: " << input.logfile << endl;
+    cout << "Used threads: " << logs.size() << endl;
+    cout << "Elapsed time = " << time_ms << " [ms]" << endl;
 }
