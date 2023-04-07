@@ -31,7 +31,7 @@ int main(int argc, char* argv[]){
     string logfile = string(argv[0]) + ".log";
     string resultfile = string(argv[0]) + ".txt";
     string pattern;
-    unsigned int threads = 4;
+    unsigned threads = 4;
     if(argc < 2 || is_param(argv[1], "help")){
         print_help();
         return 1;
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
 
 
     vector<search_res> results;
-    search(dir, pattern, &results);
+    search(dir, pattern, &results, threads);
     print_results(resultfile, &results);
 
 }

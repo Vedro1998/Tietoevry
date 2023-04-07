@@ -6,6 +6,6 @@
 #include "structs.hpp"
 
 void search(std::string search_dir, std::string pattern, 
-            std::vector<search_res>* results);
+            std::vector<search_res>* results, unsigned threads);
 
 #endif
