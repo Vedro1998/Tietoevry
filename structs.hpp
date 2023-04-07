@@ -3,6 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
+#include <thread>
+#include <utility>
 
 struct grep_input {
     std::string dir = "./";
@@ -27,6 +30,16 @@ struct search_res {
     int patterns_found;
     std::vector<unsigned long> pattern_lines;
     
+};
+
+using grep_results = std::vector<search_res>;
+using grep_logs = std::vector< std::pair<std::thread::id, std::vector<std::string>> >;
+
+struct grep_resources {
+    grep_results results;
+    grep_logs logs;
+    std::mutex results_mutex;
+    std::mutex logs_mutex;
 };
 
 #endif

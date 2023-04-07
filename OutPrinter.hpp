@@ -5,7 +5,6 @@
 #include <vector>
 #include <fstream>
 #include "structs.hpp"
-#include "types.hpp"
 
 class OutPrinter {
 public:

@@ -32,10 +32,9 @@ public:
     }
 
     template<typename FunctionType>
-    void submit(FunctionType fun, std::string filepath, std::string pattern, std::vector<search_res>* results, std::mutex* results_mutex,
-                std::vector< std::pair<std::thread::id, std::vector<std::string>> >* threads_files, std::mutex* logs_mutex)
+    void submit(FunctionType fun, std::string filepath, std::string pattern, grep_resources* resources)
     {
-        work_queue.push(std::bind(fun, filepath, pattern, results, results_mutex, threads_files, logs_mutex));
+        work_queue.push(std::bind(fun, filepath, pattern, resources));
     }
 private:
     std::atomic_bool done;

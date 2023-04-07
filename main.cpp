@@ -9,7 +9,6 @@
 #include "ArgParser.hpp"
 #include "OutPrinter.hpp"
 #include "errorcodes.hpp"
-#include "types.hpp"
 #include "structs.hpp"
 #include "search.hpp"
 #include "utils.hpp"
@@ -25,20 +24,17 @@ int main(int argc, char* argv[]){
         return err;
 
 
-    grep_results results;
-    grep_logs logs;
-    mutex results_mutex;
-    mutex logs_mutex;
+    grep_resources resources;
     auto start = chrono::high_resolution_clock::now();
     {
         GreprThreadPool pool(input.threads);
-        search(input.dir, input.pattern, &results, &logs, &pool, &results_mutex, &logs_mutex);
+        search(input.dir, input.pattern, &resources, &pool);
     }
 
-    sort_results(&results);
-    sort_logs(&logs);
+    sort_results(&(resources.results));
+    sort_logs(&(resources.logs));
     
-    OutPrinter op(results, logs);
+    OutPrinter op(resources.results, resources.logs);
     op.print_results(input.resultfile);
     op.print_logs(input.logfile);
     auto stop = chrono::high_resolution_clock::now();

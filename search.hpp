@@ -9,9 +9,7 @@
 #include "GreprThreadPool.hpp"
 #include "structs.hpp"
 
-void search(std::string search_dir, std::string pattern, 
-            std::vector<search_res>* results,
-            std::vector< std::pair<std::thread::id, std::vector<std::string>> >* threads_files,
-            GreprThreadPool* pool, std::mutex* results_mutex, std::mutex* logs_mutex);
+void search(std::string search_dir, std::string pattern, grep_resources* resources,
+            GreprThreadPool* pool);
 
 #endif

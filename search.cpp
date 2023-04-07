@@ -12,18 +12,31 @@
 using namespace std;
 namespace fs = filesystem;
 
-void search_file(string filepath, string pattern, vector<search_res>* results, 
-                 mutex* results_mutex, vector< pair<thread::id, vector<string>> >* logs, mutex* logs_mutex)
-{
+void update_logs(string filepath, grep_resources* resources){
     thread::id id = this_thread::get_id();
-    logs_mutex->lock();
-    auto found_it = find_if(logs->begin(), logs->end(), [=](auto& l){return l.first==id;});
-    if(found_it != logs->end())
+    resources->logs_mutex.lock();
+    auto found_it = find_if(resources->logs.begin(), resources->logs.end(), [=](auto& l){return l.first==id;});
+    if(found_it != resources->logs.end())
             found_it->second.push_back(filepath);        
         else
-            logs->emplace_back(id, vector<string>{filepath});
-    logs_mutex->unlock();
+            resources->logs.emplace_back(id, vector<string>{filepath});
+    resources->logs_mutex.unlock();
+}
 
+void update_results(int patterns_cnt, string filepath, grep_resources* resources,
+                    const vector<unsigned long>& lines_with_pattern)
+{
+    if(patterns_cnt > 0){
+        search_res res {fs::absolute(filepath), patterns_cnt, lines_with_pattern};
+        resources->results_mutex.lock();
+        resources->results.push_back(res);
+        resources->results_mutex.unlock();
+    }
+}
+
+void search_file(string filepath, string pattern, grep_resources* resources)
+{
+    update_logs(filepath, resources);
     ifstream ifs(filepath);
     if(!ifs){
         cerr << "Search error: couldn't open file: " << filepath << endl;
@@ -46,27 +59,18 @@ void search_file(string filepath, string pattern, vector<search_res>* results,
             line_idx++;
         }
         ifs.close();
-        if(patterns_cnt > 0){
-            search_res res {fs::absolute(filepath), patterns_cnt, lines_with_pattern};
-            results_mutex->lock();
-            results->push_back(res);
-            results_mutex->unlock();
-        }
-            
+        update_results(patterns_cnt, filepath, resources, lines_with_pattern);
     }
 }
 
-void search(string search_dir, string pattern, vector<search_res>* results, 
-            vector< pair<thread::id, vector<string>> >* threads_files, GreprThreadPool* pool,
-            mutex* results_mutex, mutex* logs_mutex)
+void search(string search_dir, string pattern, grep_resources* resources,
+            GreprThreadPool* pool)
 {
     for(const auto& entry : fs::directory_iterator(search_dir)){
-        if(entry.is_directory()){
-            search(entry.path(), pattern, results, threads_files, pool, results_mutex, logs_mutex);
-        }
-        else{
-            pool->submit(search_file, entry.path(), pattern, results, results_mutex, threads_files, logs_mutex);
-        }
+        if(entry.is_directory())
+            search(entry.path(), pattern, resources, pool);
+        else
+            pool->submit(search_file, entry.path(), pattern, resources);
     }
 
 }
