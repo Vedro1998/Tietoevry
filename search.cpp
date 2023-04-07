@@ -56,16 +56,15 @@ void search_file(string filepath, string pattern, vector<search_res>* results,
     }
 }
 
-void search(string search_dir, string pattern, vector<search_res>* results, unsigned threads, 
-            vector< pair<thread::id, vector<string>> >* threads_files){
-    GreprThreadPool pool(threads);
-    mutex results_mutex;
-    mutex logs_mutex;
+void search(string search_dir, string pattern, vector<search_res>* results, 
+            vector< pair<thread::id, vector<string>> >* threads_files, GreprThreadPool* pool,
+            mutex* results_mutex, mutex* logs_mutex){
     for(const auto& entry : fs::directory_iterator(search_dir)){
-        if(entry.is_directory())
-            search(entry.path(), pattern, results, threads, threads_files);
+        if(entry.is_directory()){
+            search(entry.path(), pattern, results, threads_files, pool, results_mutex, logs_mutex);
+        }
         else{
-            pool.submit(search_file, entry.path(), pattern, results, &results_mutex, threads_files, &logs_mutex);
+            pool->submit(search_file, entry.path(), pattern, results, results_mutex, threads_files, logs_mutex);
         }
     }
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <thread>
 #include <utility>
+#include <chrono>
+#include <mutex>
 #include "structs.hpp"
 #include "search.hpp"
 #include "print.hpp"
@@ -61,7 +63,13 @@ int main(int argc, char* argv[]){
 
     vector<search_res> results;
     vector< pair<thread::id, vector<string>> > logs;
+    mutex results_mutex;
+    mutex logs_mutex;
     search(dir, pattern, &results, threads, &logs);
+    {
+        GreprThreadPool pool(threads);
+        search(dir, pattern, &results, &logs, &pool, &results_mutex, &logs_mutex);
+    }
     print_results(resultfile, &results);
     print_logs(logfile, &logs);
 
