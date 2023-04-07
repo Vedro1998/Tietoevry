@@ -4,6 +4,15 @@
 #include <string>
 #include <vector>
 
+struct grep_input {
+    std::string dir = "./";
+    std::string logfile;
+    std::string resultfile;
+    std::string pattern;
+    unsigned threads = 4;
+
+};
+
 struct info {
     int searched_files;
     int patterns_number;
