@@ -50,7 +50,7 @@ void print_logs(std::string log_file, vector< pair<thread::id, vector<string>> >
         for(const auto& l: *threads_files){
             ofs << l.first << ": ";
             for(int i = 0; i < l.second.size(); i++){
-                ofs << l.second[i].substr(l.second[i].find_last_of('/'));
+                ofs << l.second[i].substr(l.second[i].find_last_of('/')+1);
                 if(i < l.second.size()-1)
                     ofs << ", ";
                 else
